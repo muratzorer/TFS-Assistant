@@ -1,12 +1,14 @@
 # TFS-Assistant
 CLI tool for easily merging TFS changesets linked to a WorkItem. Shines when using Branch by Quality (Environment Branching)
 
-## Usage Example
+## Usage
 
-	`merge --collection "http://127.0.0.1:8080/Tfs/DefaultCollection" --workspace "MyPc001" --source "$/Project/Solution/Dev" --target "$/Project/Solution/Test" --workitem 1234`
+Example:
+
+	TFSAssistant.exe merge --collection "http://127.0.0.1:8080/Tfs/DefaultCollection" --workspace "MyPc001" --source "$/Project/Solution/Dev" --target "$/Project/Solution/Test" --workitem 1234
 	
+Parameters:
 
-	```
 	-c, --collection    Required. Collection URL. eg: 'http://127.0.0.1:8080/Tfs/DefaultCollection'
 
 	-s, --workspace     Required. Workspace name. eg: 'MyPc001'
@@ -20,4 +22,4 @@ CLI tool for easily merging TFS changesets linked to a WorkItem. Shines when usi
 	--help              Display this help screen.
 
 	--version           Display version information.
-	```
+	
