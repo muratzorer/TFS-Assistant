@@ -4,6 +4,7 @@ CLI tool for easily merging TFS changesets linked to a WorkItem. Shines when usi
 ## Usage Example
 
 	`merge --collection "http://127.0.0.1:8080/Tfs/DefaultCollection" --workspace "MyPc001" --source "$/Project/Solution/Dev" --target "$/Project/Solution/Test" --workitem 1234`
+	
 
 	```
 	-c, --collection    Required. Collection URL. eg: 'http://127.0.0.1:8080/Tfs/DefaultCollection'
