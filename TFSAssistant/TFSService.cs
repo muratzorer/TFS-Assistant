@@ -45,14 +45,18 @@ namespace TFSAssistant
 
         public void MergeByWorkItem()
         {
+            var tuples = GetLinkAndChangesetPairs(_workitemID, _source);
+            if (tuples == null || tuples.Count() == 0)
+            {  
+                _log.InfoFormat("There is no applicable changeset to merge to target branch '{0}' linked to workitem {1}.", _target, _workitemID);
+                return;
+            }
+
             var sourceResult = GetLatest(_source);
             if (sourceResult == false) return;
 
             var targetResult = GetLatest(_target);
             if (targetResult == false) return;
-
-            var tuples = GetLinkAndChangesetPairsByWorkitemID(_workitemID);
-            if (tuples == null || tuples.Count() == 0) return;
 
             var workitem = _workitemStore.GetWorkItem(_workitemID);
 
@@ -125,17 +129,18 @@ namespace TFSAssistant
             }
             else if (status.NoActionNeeded == false && status.NumConflicts > 0 && status.HaveResolvableWarnings == false)
             {
-                _log.Info("Result: Completed with conflicts. Conflicts could NOT resolved automatically. Please resolve conflicts using IDE and rerun exe. Process will continue from this checkpoint.");
+                _log.Info("Result: Completed with conflicts. Conflicts could NOT resolved automatically. Please resolve conflicts using IDE and rerun exe; process is stateless");
                 return false;
             }
             else
             {
-                _log.Info("Result: *** Unhandled conflict status, process is terminating. Possible completed with conflicts, please resolve conflicts using IDE and contact administrator before rerun exe. Process will continue from this checkpoint. ***");
+                _log.Info("Result: *** Unhandled conflict status, process is terminating. Possible completed with conflicts, please resolve conflicts using IDE and contact administrator before rerun exe; process is stateless ***");
+                _log.InfoFormat("NumOperations: {0}, NumResolvedConflicts: {1}, NumWarnings: {2}, NoActionNeeded {3}, HaveResolvableWarnings: {4}", status.NumOperations, status.NumResolvedConflicts, status.NumWarnings, status.NoActionNeeded, status.HaveResolvableWarnings);
                 return false;
             }
         }
 
-        private List<Tuple<Link, Changeset>> GetLinkAndChangesetPairsByWorkitemID(int workitemID)
+        private List<Tuple<Link, Changeset>> GetLinkAndChangesetPairs(int workitemID, string source)
         {
             var query = string.Format("SELECT * FROM WorkItems WHERE [System.Id] = {0}", workitemID);
             var workItems = _workitemStore.Query(query); // _workitemStore.GetWorkItem() throws exception if not found. This is fail safe.
@@ -161,7 +166,7 @@ namespace TFSAssistant
 
                 // Ensure changeset is related to given source branch
                 var changeset = versionControl.ArtifactProvider.GetChangeset(new Uri(extLink.LinkedArtifactUri));
-                if (changeset.Changes[0].Item.ServerItem.StartsWith(_source) == false) continue;
+                if (changeset.Changes[0].Item.ServerItem.StartsWith(source) == false) continue;
 
                 // Ensure changeset is related to this user
                 if (changeset.Committer != _sourceControl.AuthorizedUser) continue;
